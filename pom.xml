@@ -1,0 +1,29 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.zeeraa.physicalcurrency</groupId>
+	<artifactId>PhysicalCurrencyParent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<build>
+		<plugins>
+		</plugins>
+	</build>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>zeeraas-snapshots</id>
+			<url>https://nexus.zeeraa.net/repository/maven-snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>zeeraas-releases</id>
+			<url>https://nexus.zeeraa.net/repository/maven-releases/</url>
+		</repository>
+	</distributionManagement>
+
+	<modules>
+		<module>PhysicalCurrency</module>
+		<module>PhysicalCurrencyAPI</module>
+	</modules>
+</project>

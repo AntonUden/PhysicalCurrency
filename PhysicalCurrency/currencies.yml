@@ -1,0 +1,14 @@
+primary-currency: usd
+
+currencies:
+    usd:
+        display-name-singular: 'USD'
+        display-name-plural: 'USD'
+        short-name: '$'
+        # exchange rate has to be 1 for the primary currency
+        exchange-rate: 1
+    euro:
+        display-name-singular: 'Euro'
+        display-name-plural: 'Euro'
+        short-name: '€'
+        exchange-rate: 1.17
