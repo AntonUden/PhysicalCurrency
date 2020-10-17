@@ -10,6 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.zeeraa.physicalcurency.currency.DefaultCurrencyManager;
+import net.zeeraa.physicalcurency.currency.item.DefaultCurrencyItemManager;
 import net.zeeraa.physicalcurrency.api.currency.CurrencyManager;
 import net.zeeraa.physicalcurrency.api.currency.item.CurrencyItemManager;
 
@@ -76,7 +77,7 @@ public class PhysicalCurrency extends JavaPlugin {
 		
 		// -=-=-= CURRENCY MANAGER =-=-=-
 		currencyManager = new DefaultCurrencyManager();
-		//TODO: Currency item manager
+	currencyItemManager = new DefaultCurrencyItemManager();
 	}
 
 	@Override
