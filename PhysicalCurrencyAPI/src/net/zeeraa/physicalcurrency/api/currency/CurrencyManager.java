@@ -50,7 +50,7 @@ public abstract class CurrencyManager {
 	/**
 	 * Save any modifications to the loaded currencies
 	 * <p>
-	 * Any changes in currencies.yml made after loading the currencies will be
+	 * Any changes in currencies.json made after loading the currencies will be
 	 * overwritten
 	 * 
 	 * @return <code>false</code> on failure

@@ -1,0 +1,29 @@
+[
+	{
+		"name": "1USD",
+		"display_name": "1 USD",
+		"lore": [],
+		"material": "PRISMARINE_CRYSTALS",
+		"currency": "usd",
+		"currency_amount": 1,
+		"custom_model_data": 1000
+	},
+	{
+		"name": "5USD",
+		"display_name": "5 USD",
+		"lore": [],
+		"material": "PRISMARINE_CRYSTALS",
+		"currency": "usd",
+		"currency_amount": 1,
+		"custom_model_data": 1001
+	},
+	{
+		"name": "1EURO",
+		"display_name": "1 Euro",
+		"lore": [],
+		"material": "PRISMARINE_CRYSTALS",
+		"currency": "euro",
+		"currency_amount": 1,
+		"custom_model_data": 2000
+	}
+]

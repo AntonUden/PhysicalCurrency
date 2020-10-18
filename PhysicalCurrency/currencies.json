@@ -1,0 +1,14 @@
+[
+	{
+		"name": "usd",
+		"display-name-singular": "USD",
+		"display-name-plural": "USD",
+		"vault-value": 1
+	},
+	{
+		"name": "euro",
+		"display-name-singular": "Euro",
+		"display-name-plural": "Euro",
+		"vault-value": 2
+	}
+]

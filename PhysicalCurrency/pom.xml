@@ -21,6 +21,9 @@
 				<includes>
 					<include>plugin.yml</include>
 					<include>config.yml</include>
+					
+					<include>currencies.json</include>
+					<include>currency-items.json</include>
 				</includes>
 			</resource>
 		</resources>
@@ -117,6 +120,13 @@
 			<groupId>net.zeeraa.physicalcurrency</groupId>
 			<artifactId>PhysicalCurrencyAPI</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20200518</version>
 			<scope>compile</scope>
 		</dependency>
 

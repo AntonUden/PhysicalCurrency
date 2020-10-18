@@ -1,5 +1,7 @@
 package net.zeeraa.physicalcurrency.api.currency;
 
+import org.json.JSONObject;
+
 public class Currency {
 	private String name;
 	private String displayNameSingular;
@@ -12,6 +14,31 @@ public class Currency {
 		this.displayNameSingular = displayNameSingular;
 		this.displayNamePlural = displayNamePlural;
 		this.vaultValue = vaultValue;
+	}
+
+	public static Currency fromJson(JSONObject json) {
+		String name = json.getString("name");
+		String displayNameSingular = json.getString("display_name_singular");
+		String displayNamePlural = json.getString("display_name_plural");
+
+		double vaultValue = json.getDouble("vault_value");
+
+		return new Currency(name, displayNameSingular, displayNamePlural, vaultValue);
+	}
+
+	public static JSONObject toJson(Currency currency) {
+		JSONObject result = new JSONObject();
+
+		result.put("name", currency.getName());
+		result.put("display_name_singular", currency.getDisplayNameSingular());
+		result.put("display_name_plural", currency.getDisplayNamePlural());
+		result.put("vault_value", currency.getVaultValue());
+
+		return result;
+	}
+
+	public JSONObject toJson() {
+		return Currency.toJson(this);
 	}
 
 	/**
