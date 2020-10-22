@@ -131,7 +131,7 @@ public class DefaultVaultImplementation implements Economy {
 				return new EconomyResponse(amount, getBalance(player), ResponseType.SUCCESS, "");
 			}
 		}
-		return new EconomyResponse(0, 0, ResponseType.FAILURE, "Could not deposit money");
+		return new EconomyResponse(0, 0, ResponseType.FAILURE, "Cant deposit that amount to the player");
 	}
 
 	@Override

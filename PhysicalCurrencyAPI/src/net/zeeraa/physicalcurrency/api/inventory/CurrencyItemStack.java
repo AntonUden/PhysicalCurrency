@@ -1,5 +1,6 @@
 package net.zeeraa.physicalcurrency.api.inventory;
 
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.zeeraa.physicalcurrency.api.currency.Currency;
@@ -8,8 +9,9 @@ import net.zeeraa.physicalcurrency.api.currency.item.CurrencyItem;
 public class CurrencyItemStack {
 	private CurrencyItem currencyItem;
 	private ItemStack itemStack;
+	private Inventory inventory;
 
-	public CurrencyItemStack(CurrencyItem currencyItem, ItemStack itemStack) {
+	public CurrencyItemStack(CurrencyItem currencyItem, ItemStack itemStack, Inventory inventory) {
 		this.currencyItem = currencyItem;
 		this.itemStack = itemStack;
 	}
@@ -25,8 +27,12 @@ public class CurrencyItemStack {
 	public Currency getCurrency() {
 		return currencyItem.getCurrency();
 	}
-	
-	public double getCurrencyVaultValue() {
-		return currencyItem.getCurrency().getVaultValue();
+
+	public Inventory getInventory() {
+		return inventory;
+	}
+
+	public double getSingleItemVaultValue() {
+		return currencyItem.getCurrency().getVaultValue() * currencyItem.getCurrencyAmount();
 	}
 }

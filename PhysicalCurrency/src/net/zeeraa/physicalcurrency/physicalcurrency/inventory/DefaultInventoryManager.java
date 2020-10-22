@@ -1,14 +1,17 @@
 package net.zeeraa.physicalcurrency.physicalcurrency.inventory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import net.zeeraa.physicalcurrency.api.PhysicalCurrencyAPI;
 import net.zeeraa.physicalcurrency.api.balance.Balance;
@@ -18,6 +21,8 @@ import net.zeeraa.physicalcurrency.api.inventory.CurrencyItemStack;
 import net.zeeraa.physicalcurrency.api.inventory.InventoryManager;
 
 public class DefaultInventoryManager extends InventoryManager {
+	public static final int[] IGNORED_PLAYER_SLOTS = { 36, 37, 38, 39, 40 };
+
 	@Override
 	public List<CurrencyItemStack> getCurrencyItemStacks(Inventory inventory, Currency currency) {
 		List<CurrencyItemStack> result = new ArrayList<CurrencyItemStack>();
@@ -45,7 +50,7 @@ public class DefaultInventoryManager extends InventoryManager {
 						}
 					}
 
-					result.add(new CurrencyItemStack(ci, item));
+					result.add(new CurrencyItemStack(ci, item, inventory));
 				}
 			}
 		}
@@ -87,62 +92,56 @@ public class DefaultInventoryManager extends InventoryManager {
 
 	@Override
 	public boolean withdraw(Inventory inventory, double balance, Currency currency) {
-		System.out.println("DefaultInventoryManager.withdraw()");
 		List<CurrencyItemStack> stacks = this.getCurrencyItemStacks(inventory, currency);
-		System.out.println("stacks " + stacks.size());
+
 		double balanceLeft = balance;
 		double balanceWithdrawn = 0;
 
-		Collections.sort(stacks, Comparator.comparingDouble(CurrencyItemStack::getCurrencyVaultValue).reversed());
+		Collections.sort(stacks, Comparator.comparingDouble(CurrencyItemStack::getSingleItemVaultValue).reversed());
 
 		for (int i = 0; i < stacks.size(); i++) {
-			System.out.println("Scanning stack: " + i);
 			CurrencyItemStack cis = stacks.get(i);
 			int newStackSize = cis.getItemStack().getAmount();
 
-			System.out.println("Size: " + cis.getItemStack().getAmount());
-
 			while (newStackSize > 0 && balanceLeft > 0) {
-				if (balanceLeft < cis.getCurrencyVaultValue()) {
+				if (balanceLeft < cis.getSingleItemVaultValue()) {
 					break;
 				}
 
-				newStackSize--;
-				balanceLeft -= cis.getCurrencyVaultValue();
+				// System.out.println("stack size: " + newStackSize);
+				// System.out.println(cis.getCurrencyItem().getName() + " " +
+				// cis.getSingleItemVaultValue() + " " + cis.getCurrency().getName());
 
-				balanceWithdrawn += cis.getCurrencyVaultValue();
+				newStackSize--;
+
+				balanceLeft -= cis.getSingleItemVaultValue();
+
+				balanceWithdrawn += cis.getSingleItemVaultValue();
+
+				// System.out.println("newStackSize: " + newStackSize + " balanceLeft: " +
+				// balanceLeft + " balanceWithdrawn: " + balanceWithdrawn);
 			}
 
 			if (newStackSize > 0) {
 				cis.getItemStack().setAmount(newStackSize);
-				System.out.println("Setting size to " + newStackSize);
 			} else {
 				inventory.removeItem(cis.getItemStack());
-				System.out.println("Removing the stack");
 			}
 
-			System.out.println("balanceLeft: " + balanceLeft);
-			System.out.println("i == stacks.size() - 1: " + (i == stacks.size() - 1));
-			
 			if (balanceLeft > 0 && (i == stacks.size() - 1)) {
-				// if a player has a 5 dollar item and 4 dollar is withdrawn withdraw the 5
-				// dollar item instead
 				int stackSize = cis.getItemStack().getAmount();
 
 				if (stackSize > 0) {
 					cis.getItemStack().setAmount(stackSize - 1);
 				} else {
-					inventory.remove(cis.getItemStack());
+					cis.getInventory().remove(cis.getItemStack());
 				}
 
-				balanceLeft -= cis.getCurrencyVaultValue();
-				balanceWithdrawn += cis.getCurrencyVaultValue();
+				balanceLeft -= cis.getSingleItemVaultValue();
+				balanceWithdrawn += cis.getSingleItemVaultValue();
 			}
 		}
 
-		System.out.println("At final stage");
-		System.out.println("Withdraw balance " + balance + " resulted in a total of " + balanceWithdrawn + " withdrawn");
-		System.out.println("Final balanceLeft: " + balanceLeft);
 		if (PhysicalCurrencyAPI.isDebugMode()) {
 			PhysicalCurrencyAPI.getPlugin().getLogger().info("Withdraw balance " + balance + " resulted in a total of " + balanceWithdrawn + " withdrawn");
 		}
@@ -150,15 +149,115 @@ public class DefaultInventoryManager extends InventoryManager {
 		return balanceLeft <= 0;
 	}
 
+	private Map<CurrencyItem, Integer> getAmountToAdd(double balance, Currency currency) {
+		List<CurrencyItem> playerCurrencyItems = PhysicalCurrencyAPI.getCurrencyItemManager().getCurrencyItems(currency);
+		Map<CurrencyItem, Integer> amountToAdd = new HashMap<CurrencyItem, Integer>();
+
+		Collections.sort(playerCurrencyItems, Comparator.comparingDouble(CurrencyItem::getVaultValue).reversed());
+
+		double amountLeft = balance;
+
+		for (CurrencyItem ci : playerCurrencyItems) {
+			double vaultValue = ci.getVaultValue();
+
+			int failsafeBecauseMyCodeIsBad = 1000000;
+
+			while (amountLeft >= vaultValue) {
+				if (amountToAdd.containsKey(ci)) {
+					amountToAdd.put(ci, amountToAdd.get(ci) + 1);
+				} else {
+					amountToAdd.put(ci, (int) 1);
+				}
+				amountLeft -= vaultValue;
+
+				failsafeBecauseMyCodeIsBad--;
+				if (failsafeBecauseMyCodeIsBad <= 0) {
+					PhysicalCurrencyAPI.getPlugin().getLogger().severe("Got stuck in while loop during deposit or deposit check. Check you config and validate that the vault value of your currency is not lower than 1");
+					return null;
+				}
+			}
+		}
+		return amountToAdd;
+	}
+
+	private boolean canAddAmount(Inventory inventory, Map<CurrencyItem, Integer> amount) {
+		int avaliableSlots = 0;
+
+		for (int i = 0; i < inventory.getSize(); i++) {
+			if (inventory.getItem(i) == null) {
+				// System.out.println("Slot: " + i + " is empty");
+				boolean shouldCountSlot = true;
+
+				if (inventory instanceof PlayerInventory) {
+					for (int j = 0; j < IGNORED_PLAYER_SLOTS.length; j++) {
+						// System.out.println("IGNORED_PLAYER_SLOTS[j] == i : " +
+						// (IGNORED_PLAYER_SLOTS[j] == i) + " j: " + j + " i: " + i + "
+						// IGNORED_PLAYER_SLOTS[j]: " + IGNORED_PLAYER_SLOTS[j]);
+						if (IGNORED_PLAYER_SLOTS[j] == i) {
+							shouldCountSlot = false;
+							continue;
+						}
+					}
+				}
+
+				if (shouldCountSlot) {
+					avaliableSlots++;
+				}
+			}
+		}
+
+		// System.out.println("Initial avaliableSlots: " + avaliableSlots);
+
+		for (CurrencyItem ci : amount.keySet()) {
+			double itemCount = amount.get(ci);
+
+			int stacks = (int) Math.ceil(((double) itemCount) / ((double) ci.getMaterial().getMaxStackSize()));
+
+			// System.out.println("raw stack size: " + ((double) itemCount) / ((double)
+			// ci.getMaterial().getMaxStackSize()));
+			// System.out.println("stacks: " + stacks + " for " + ci.getName());
+
+			avaliableSlots -= stacks;
+		}
+
+		// System.out.println("Final avaliableSlots: " + avaliableSlots);
+
+		return avaliableSlots >= 0;
+	}
+
 	@Override
 	public boolean canDeposit(Inventory inventory, double balance, Currency currency) {
-		List<Balance> pBalance = this.getBalance(inventory, currency);
-		return false;
+		return canAddAmount(inventory, getAmountToAdd(balance, currency));
 	}
 
 	@Override
 	public boolean deposit(Inventory inventory, double balance, Currency currency) {
-		List<Balance> pBalance = this.getBalance(inventory, currency);
+		Map<CurrencyItem, Integer> amountToAdd = getAmountToAdd(balance, currency);
+
+		if (canAddAmount(inventory, amountToAdd)) {
+			for (CurrencyItem ci : amountToAdd.keySet()) {
+				int itemCount = amountToAdd.get(ci);
+				int stackSize = ci.getMaterial().getMaxStackSize();
+
+				while (itemCount > 0) {
+					int addSize = itemCount;
+
+					if (addSize > stackSize) {
+						addSize = stackSize;
+					}
+
+					ItemStack stack = ci.getItem();
+					stack.setAmount(addSize);
+
+					inventory.addItem(stack);
+
+					itemCount -= addSize;
+				}
+			}
+
+			return true;
+		}
+
 		return false;
 	}
 }

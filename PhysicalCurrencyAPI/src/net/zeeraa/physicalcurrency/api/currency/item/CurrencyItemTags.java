@@ -5,7 +5,7 @@ import org.bukkit.NamespacedKey;
 import net.zeeraa.physicalcurrency.api.PhysicalCurrencyAPI;
 
 public enum CurrencyItemTags {
-	ITEM_CURRENCY_TYPE("currency-type"), ITEM_CURRENCY_AMOUNT("currency-amount");
+	ITEM_CURRENCY_TYPE("currency-type"), CURRENCY_ITEM_NAME("currency-item-name");
 
 	private String key;
 

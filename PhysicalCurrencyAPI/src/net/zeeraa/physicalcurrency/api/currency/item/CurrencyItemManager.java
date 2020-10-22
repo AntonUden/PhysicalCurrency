@@ -89,13 +89,13 @@ public abstract class CurrencyItemManager {
 			Currency currency = PhysicalCurrencyAPI.getCurrencyManager().getCurrency(meta.getPersistentDataContainer().get(CurrencyItemTags.ITEM_CURRENCY_TYPE.getNamespacedKey(), PersistentDataType.STRING));
 
 			if (currency != null) {
-				double value = meta.getPersistentDataContainer().get(CurrencyItemTags.ITEM_CURRENCY_AMOUNT.getNamespacedKey(), PersistentDataType.DOUBLE);
+				String currencyItemName = meta.getPersistentDataContainer().get(CurrencyItemTags.CURRENCY_ITEM_NAME.getNamespacedKey(), PersistentDataType.STRING);
 
 				List<CurrencyItem> currencyItems = getCurrencyItems(currency);
 
-				if (currency != null) {
+				if (currencyItems != null) {
 					for (CurrencyItem ci : currencyItems) {
-						if (ci.getCurrencyAmount() == value) {
+						if (ci.getName().equalsIgnoreCase(currencyItemName)) {
 							return ci;
 						}
 					}

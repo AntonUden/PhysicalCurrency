@@ -124,7 +124,7 @@ public class CurrencyItem {
 		meta.setLore(getLore());
 
 		meta.getPersistentDataContainer().set(CurrencyItemTags.ITEM_CURRENCY_TYPE.getNamespacedKey(), PersistentDataType.STRING, currency.getName());
-		meta.getPersistentDataContainer().set(CurrencyItemTags.ITEM_CURRENCY_AMOUNT.getNamespacedKey(), PersistentDataType.DOUBLE, getCurrencyAmount());
+		meta.getPersistentDataContainer().set(CurrencyItemTags.CURRENCY_ITEM_NAME.getNamespacedKey(), PersistentDataType.STRING, this.getName());
 
 		item.setItemMeta(meta);
 
@@ -177,5 +177,9 @@ public class CurrencyItem {
 
 	public void setCustomModelData(int customModelData) {
 		this.customModelData = customModelData;
+	}
+	
+	public double getVaultValue() {
+		return currency.getVaultValue() * currencyAmount;
 	}
 }
