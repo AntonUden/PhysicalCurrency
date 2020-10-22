@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 
 
 public abstract class CurrencyManager {
+	public abstract Currency getDefaultCurrency();
+	
 	/**
 	 * Get a map containing all currencies loaded
 	 * <p>
@@ -56,4 +58,8 @@ public abstract class CurrencyManager {
 	 * @return <code>false</code> on failure
 	 */
 	public abstract boolean saveCurrencies();
+
+	public boolean isPrimary(Currency currency) {
+		return getDefaultCurrency().equals(currency);
+	}
 }

@@ -23,7 +23,7 @@
 					<include>config.yml</include>
 					
 					<include>currencies.json</include>
-					<include>currency-items.json</include>
+					<include>items.json</include>
 				</includes>
 			</resource>
 		</resources>

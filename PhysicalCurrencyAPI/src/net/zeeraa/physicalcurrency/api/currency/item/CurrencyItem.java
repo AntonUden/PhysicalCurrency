@@ -69,7 +69,7 @@ public class CurrencyItem {
 		double currencyAmount = json.getDouble("currency_amount");
 		int customModelData = json.getInt("custom_model_data");
 
-		return new CurrencyItem(material, currency, lore, currencyName, displayName, currencyAmount, customModelData);
+		return new CurrencyItem(material, currency, lore, name, displayName, currencyAmount, customModelData);
 	}
 
 	public static JSONObject toJson(CurrencyItem currencyItem) {
@@ -88,10 +88,28 @@ public class CurrencyItem {
 		result.put("currency", currencyItem.getCurrency().getName());
 		result.put("currency_amount", currencyItem.getCurrencyAmount());
 		result.put("custom_model_data", currencyItem.getCustomModelData());
-		
+
 		return result;
 	}
-	
+
+	public void updateCurrencyItem(CurrencyItem newData) {
+		this.setCurrencyAmount(newData.getCurrencyAmount());
+		this.setCustomModelData(newData.getCustomModelData());
+		this.setDisplayName(newData.getDisplayName());
+		this.setLore(newData.getLore());
+		this.setMaterial(newData.getMaterial());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof CurrencyItem) {
+			if (((CurrencyItem) obj).getName().equalsIgnoreCase(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public JSONObject toJson() {
 		return CurrencyItem.toJson(this);
 	}
@@ -100,13 +118,13 @@ public class CurrencyItem {
 		ItemStack item = new ItemStack(material);
 		ItemMeta meta = item.getItemMeta();
 
-		meta.setDisplayName(name);
-		meta.setLocalizedName(name);
-		meta.setCustomModelData(customModelData);
-		meta.setLore(lore);
+		meta.setDisplayName(getDisplayName());
+		meta.setLocalizedName(getDisplayName());
+		meta.setCustomModelData(getCustomModelData());
+		meta.setLore(getLore());
 
 		meta.getPersistentDataContainer().set(CurrencyItemTags.ITEM_CURRENCY_TYPE.getNamespacedKey(), PersistentDataType.STRING, currency.getName());
-		meta.getPersistentDataContainer().set(CurrencyItemTags.ITEM_CURRENCY_AMOUNT.getNamespacedKey(), PersistentDataType.DOUBLE, currencyAmount);
+		meta.getPersistentDataContainer().set(CurrencyItemTags.ITEM_CURRENCY_AMOUNT.getNamespacedKey(), PersistentDataType.DOUBLE, getCurrencyAmount());
 
 		item.setItemMeta(meta);
 
@@ -117,6 +135,10 @@ public class CurrencyItem {
 		return material;
 	}
 
+	public void setMaterial(Material material) {
+		this.material = material;
+	}
+
 	public Currency getCurrency() {
 		return currency;
 	}
@@ -125,8 +147,16 @@ public class CurrencyItem {
 		return currencyAmount;
 	}
 
+	public void setCurrencyAmount(double currencyAmount) {
+		this.currencyAmount = currencyAmount;
+	}
+
 	public List<String> getLore() {
 		return lore;
+	}
+
+	public void setLore(List<String> lore) {
+		this.lore = lore;
 	}
 
 	public String getName() {
@@ -137,7 +167,15 @@ public class CurrencyItem {
 		return displayName;
 	}
 
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
 	public int getCustomModelData() {
 		return customModelData;
+	}
+
+	public void setCustomModelData(int customModelData) {
+		this.customModelData = customModelData;
 	}
 }

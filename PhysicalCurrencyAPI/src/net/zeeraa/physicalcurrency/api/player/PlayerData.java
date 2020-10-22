@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import net.zeeraa.physicalcurrency.api.PhysicalCurrencyAPI;
 import net.zeeraa.physicalcurrency.api.currency.Currency;
 
 public class PlayerData {
@@ -35,5 +36,10 @@ public class PlayerData {
 
 	public void setPrimaryCurrency(Currency primaryCurrency) {
 		this.primaryCurrency = primaryCurrency;
+		this.save();
+	}
+	
+	public boolean save() {
+		return PhysicalCurrencyAPI.getPlayerDataManager().save(this);
 	}
 }

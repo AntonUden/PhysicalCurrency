@@ -2,6 +2,8 @@ package net.zeeraa.physicalcurrency.api.currency;
 
 import org.json.JSONObject;
 
+import net.zeeraa.physicalcurrency.api.PhysicalCurrencyAPI;
+
 public class Currency {
 	private String name;
 	private String displayNameSingular;
@@ -17,7 +19,7 @@ public class Currency {
 	}
 
 	public static Currency fromJson(JSONObject json) {
-		String name = json.getString("name");
+		String name = json.getString("name").toLowerCase();
 		String displayNameSingular = json.getString("display_name_singular");
 		String displayNamePlural = json.getString("display_name_plural");
 
@@ -128,7 +130,7 @@ public class Currency {
 	public boolean equals(Object obj) {
 		if (obj != null) {
 			if (obj instanceof Currency) {
-				return this.getName().equalsIgnoreCase(((Currency) obj).getName()) && this.getDisplayNameSingular().equalsIgnoreCase(((Currency) obj).getDisplayNameSingular()) && this.getDisplayNamePlural().equalsIgnoreCase(((Currency) obj).getDisplayNamePlural());
+				return this.getName().equalsIgnoreCase(((Currency) obj).getName());
 			}
 
 			if (obj instanceof String) {
@@ -137,6 +139,14 @@ public class Currency {
 		}
 
 		return false;
+	}
+
+	public static boolean isPrimary(Currency currency) {
+		return PhysicalCurrencyAPI.getCurrencyManager().isPrimary(currency);
+	}
+
+	public boolean isPrimary() {
+		return Currency.isPrimary(this);
 	}
 
 	/**

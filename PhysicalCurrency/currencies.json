@@ -1,14 +1,17 @@
-[
-	{
-		"name": "usd",
-		"display-name-singular": "USD",
-		"display-name-plural": "USD",
-		"vault-value": 1
-	},
-	{
-		"name": "euro",
-		"display-name-singular": "Euro",
-		"display-name-plural": "Euro",
-		"vault-value": 2
-	}
-]
+{
+	"default_currency": "usd",
+	"currencies": [
+		{
+			"name": "usd",
+			"display_name_singular": "USD",
+			"display_name_plural": "USD",
+			"vault_value": 1
+		},
+		{
+			"name": "euro",
+			"display_name_singular": "Euro",
+			"display_name_plural": "Euro",
+			"vault_value": 2
+		}
+	]
+}

@@ -1,4 +1,4 @@
-package net.zeeraa.physicalcurency.currency;
+package net.zeeraa.physicalcurrency.currency;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -8,15 +8,18 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.zeeraa.physicalcurency.PhysicalCurrency;
+import net.zeeraa.physicalcurrency.PhysicalCurrency;
 import net.zeeraa.physicalcurrency.api.currency.Currency;
 import net.zeeraa.physicalcurrency.api.currency.CurrencyManager;
 
 public class DefaultCurrencyManager extends CurrencyManager {
 	private Map<String, Currency> currencies;
 
+	private Currency defaultCurrency;
+
 	public DefaultCurrencyManager() {
 		currencies = new HashMap<>();
+		defaultCurrency = null;
 	}
 
 	@Override
@@ -27,7 +30,9 @@ public class DefaultCurrencyManager extends CurrencyManager {
 	@Override
 	public boolean loadCurrencies() {
 		try {
-			JSONArray jsonCurrencies = new JSONArray(FileUtils.readFileToString(PhysicalCurrency.getInstance().getCurrenciesFile(), Charset.defaultCharset()));
+			JSONObject json = new JSONObject(FileUtils.readFileToString(PhysicalCurrency.getInstance().getCurrenciesFile(), Charset.defaultCharset()));
+
+			JSONArray jsonCurrencies = json.getJSONArray("currencies");
 
 			Map<String, Currency> newCurrenciesMap = new HashMap<String, Currency>();
 
@@ -57,6 +62,27 @@ public class DefaultCurrencyManager extends CurrencyManager {
 
 			currencies = newCurrenciesMap;
 
+			String defaultCurrencyName = json.getString("default_currency");
+			Currency newDefaultCurrency = getCurrency(defaultCurrencyName);
+
+			if (newDefaultCurrency == null) {
+				if (currencies.size() == 0) {
+					PhysicalCurrency.getInstance().getLogger().warning("Default currency " + defaultCurrency + " is not loaded");
+					PhysicalCurrency.getInstance().getLogger().warning("No other currencies configured. Could not set default currency");
+					return false;
+				} else {
+					// There should be a better way of doing this but this one should work without
+					// throwing any errors
+					for (Currency currency : currencies.values()) {
+						defaultCurrency = currency;
+						PhysicalCurrency.getInstance().getLogger().warning("Using " + currency.getName() + " as the default currency since the configured default " + defaultCurrencyName + " was not found");
+						break;
+					}
+				}
+			} else {
+				defaultCurrency = newDefaultCurrency;
+			}
+
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -67,18 +93,28 @@ public class DefaultCurrencyManager extends CurrencyManager {
 	@Override
 	public boolean saveCurrencies() {
 		try {
-			JSONArray jsonResult = new JSONArray();
+			JSONObject jsonData = new JSONObject();
+			JSONArray currenciesArray = new JSONArray();
+
+			jsonData.put("default-currency", defaultCurrency.getName());
 
 			for (Currency currency : currencies.values()) {
-				jsonResult.put(currency.toJson());
+				currenciesArray.put(currency.toJson());
 			}
 
-			FileUtils.write(PhysicalCurrency.getInstance().getCurrenciesFile(), jsonResult.toString(4), Charset.defaultCharset(), false);
+			jsonData.put("currencies", currenciesArray);
+
+			FileUtils.write(PhysicalCurrency.getInstance().getCurrenciesFile(), jsonData.toString(4), Charset.defaultCharset(), false);
 
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public Currency getDefaultCurrency() {
+		return defaultCurrency;
 	}
 }
