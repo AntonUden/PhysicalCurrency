@@ -165,13 +165,6 @@ public class PhysicalCurrency extends JavaPlugin implements Listener {
 		if (Bukkit.getServer().getPluginManager().getPlugin("Vault") != null) {
 			Bukkit.getServicesManager().register(Economy.class, new DefaultVaultImplementation(), this, ServicePriority.Normal);
 		}
-		
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE +"Running PhysicalCurrency Evaluation copy. " + ChatColor.DARK_RED + "This build is not for production use!");
-			}
-		}.runTaskTimer(this, 2400L, 2400L);
 	}
 
 	@Override
